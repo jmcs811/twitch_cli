@@ -55,7 +55,7 @@ def get_streams(name):
     data = get_followed_streams(user_id, headers)
 
     for i in data['data']:
-        print(f"{i['user_login']}: {i['game_name']} {i['viewer_count']}")
+        print(f"{i['user_login']:<15} {i['game_name'][:20]:<20} {i['viewer_count']}")
 
 if __name__ == '__main__':
     get_streams()
