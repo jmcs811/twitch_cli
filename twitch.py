@@ -3,6 +3,10 @@ import urllib.parse
 import requests
 import json
 from flask import Flask
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -28,7 +32,7 @@ def login():
     """
     url = "https://id.twitch.tv/oauth2/authorize?"
     params = {
-        "client_id": "", 
+        "client_id": os.environ['client'], 
         "response_type": "token",
         "scope": "user:read:follows",
         "redirect_uri": "http://localhost:7001/redirect"}
@@ -42,8 +46,8 @@ def login():
 def get_streams(name):
     #get userid
     headers = {
-        "Client-Id": "",
-        "Authorization": "Bearer "
+        "Client-Id": os.environ['client'],
+        "Authorization": "Bearer evkg1u50ujqvjtr5kbyvieccnmnoqi"
         }
     user_id = get_userid(name, headers)
 
