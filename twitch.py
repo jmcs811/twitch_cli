@@ -6,6 +6,15 @@ from flask import Flask
 
 app = Flask(__name__)
 
+def get_userid(name, headers):
+    r = requests.get(f"https://api.twitch.tv/helix/users?login={name}", headers=headers)
+    data = json.loads(r.text)
+    return data['data'][0]['id']
+
+def get_followed_streams(user_id, headers):
+    r = requests.get(f"https://api.twitch.tv/helix/streams/followed?user_id={user_id}", headers=headers)
+    return json.loads(r.text)
+
 @app.route("/redirect")
 def hello_world():
     return "<p>Hello, World!</p>"
@@ -19,7 +28,7 @@ def login():
     """
     url = "https://id.twitch.tv/oauth2/authorize?"
     params = {
-        "client_id": "dp0t996p82u064cj7dneccwa2n7auv", 
+        "client_id": "", 
         "response_type": "token",
         "scope": "user:read:follows",
         "redirect_uri": "http://localhost:7001/redirect"}
@@ -33,16 +42,13 @@ def login():
 def get_streams(name):
     #get userid
     headers = {
-        "Client-Id": "dp0t996p82u064cj7dneccwa2n7auv",
-        "Authorization": "Bearer 8usvb9c1z4vntva0zew4ca3p10ayti"
+        "Client-Id": "",
+        "Authorization": "Bearer "
         }
-    r = requests.get(f"https://api.twitch.tv/helix/users?login={name}", headers=headers)
-    data = json.loads(r.text)
-    user_id = data['data'][0]['id']
+    user_id = get_userid(name, headers)
 
     #get followed streams
-    r = requests.get(f"https://api.twitch.tv/helix/streams/followed?user_id={user_id}", headers=headers)
-    data = json.loads(r.text)
+    data = get_followed_streams(user_id, headers)
 
     for i in data['data']:
         print(f"{i['user_login']}: {i['game_name']} {i['viewer_count']}")
