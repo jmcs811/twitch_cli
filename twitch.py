@@ -1,27 +1,11 @@
 import click
 import urllib.parse
-import requests
-import json
-from flask import Flask
+from utils.twitch_utils import get_userid, get_followed_streams
 from dotenv import load_dotenv
+import socket
 import os
 
 load_dotenv()
-
-app = Flask(__name__)
-
-def get_userid(name, headers):
-    r = requests.get(f"https://api.twitch.tv/helix/users?login={name}", headers=headers)
-    data = json.loads(r.text)
-    return data['data'][0]['id']
-
-def get_followed_streams(user_id, headers):
-    r = requests.get(f"https://api.twitch.tv/helix/streams/followed?user_id={user_id}", headers=headers)
-    return json.loads(r.text)
-
-@app.route("/redirect")
-def hello_world():
-    return "<p>Hello, World!</p>"
 
 @click.command()
 # @click.option('--name', prompt='Your name',
@@ -31,6 +15,7 @@ def login():
     Open browser for user to authorize our app
     """
     url = "https://id.twitch.tv/oauth2/authorize?"
+    
     params = {
         "client_id": os.environ['client'], 
         "response_type": "token",
@@ -39,6 +24,17 @@ def login():
 
     auth_url = "{}{}".format(url, urllib.parse.urlencode(params))
     print(auth_url)
+
+    # listeon on port 7001
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("localhost", 7001))
+    s.listen()
+    while True:
+        csock, caddr = s.accept()
+        print("Connection from: " + repr(caddr))
+        req = csock.recv(1024)
+        print(req)
+    
 
 @click.command()
 @click.option('--name', prompt='twitch username',
